@@ -51,7 +51,9 @@
           return showWarning("Invalid password")
         }
 
-        loginWithNip01(nsec)
+        // Decode nsec bech32 string to hex for login
+        const decoded = nsecDecode(nsec)
+        loginWithNip01(decoded)
         boot()
       } else {
         // No encrypted nsec, prompt user to enter nsec and save it

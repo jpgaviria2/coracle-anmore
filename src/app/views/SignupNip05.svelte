@@ -3,7 +3,7 @@
   import {loginWithNip01} from "@welshman/app"
   import {generateSecretKey, getPublicKey} from "nostr-tools"
   import * as nip19 from "nostr-tools/nip19"
-  import {nsecEncode} from "src/util/nostr"
+  import {nsecEncode, nsecDecode} from "src/util/nostr"
   import {saveEncryptedNsec} from "src/util/password"
   import {showWarning, showInfo, showSuccess} from "src/partials/Toast.svelte"
   import Input from "src/partials/Input.svelte"
@@ -124,11 +124,12 @@ Welcome to Anmore!`)
     try {
       const nip05 = `${username.trim()}@${env.NIP05_DOMAIN}`
       
-      // Save encrypted nsec
+      // Save encrypted nsec (save the bech32 string)
       await saveEncryptedNsec(nip05, nsec, password)
 
-      // Login
-      loginWithNip01(nsec)
+      // Login - decode nsec to hex string first
+      const decoded = nsecDecode(nsec)
+      loginWithNip01(decoded)
       boot()
       
       showSuccess("Account created! Welcome to Anmore.")
