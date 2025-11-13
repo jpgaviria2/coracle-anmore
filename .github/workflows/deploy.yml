@@ -79,6 +79,7 @@ jobs:
           VITE_BLUR_CONTENT: false
           VITE_DEFAULT_HASHTAG: anmore
           VITE_NIP05_DOMAIN: anmore.me
+          VITE_BASE_PATH: /coracle-anmore/
           VITE_PLATFORM_PUBKEY: 
           VITE_PLATFORM_ZAP_SPLIT: 0.05
           VITE_DUFFLEPUD_URL: 

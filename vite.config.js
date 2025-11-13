@@ -22,7 +22,13 @@ export default defineConfig(async () => {
     fs.writeFileSync(`public/icons/${name}`, contents, "binary")
   }
 
+  // Set base path for GitHub Pages if not using custom domain
+  // If using CNAME with custom domain, base should be '/'
+  // If using GitHub Pages subdirectory, base should be '/coracle-anmore/'
+  const base = process.env.VITE_BASE_PATH || '/'
+
   return {
+    base,
     server: {
       https: false,
     },
