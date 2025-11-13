@@ -14,7 +14,11 @@
   export let showMedia = false
   export let showEntire = false
 
-  const {service_name, description, location, rate, rate_type, availability, contact} = fromPairs(note.tags)
+  const {service_name, location, rate_type, availability, contact} = fromPairs(note.tags)
+  const descriptionTag = getTagValue("description", note.tags)
+  const description = descriptionTag ? descriptionTag[1] : null
+  const rateTag = getTagValue("rate", note.tags)
+  const rate = rateTag ? rateTag[1] : null
   const deleted = deriveIsDeletedByAddress(repository, note)
 </script>
 
@@ -34,7 +38,7 @@
       {#if rate}
         <span class="whitespace-nowrap font-bold">
           {rate_type ? `${rate_type}: ` : ""}
-          {commaFormat(rate)} {rate_type === "hourly" ? "/hr" : ""}
+          {commaFormat(parseInt(rate) || 0)} {rate_type === "hourly" ? "/hr" : ""}
         </span>
       {/if}
     </div>

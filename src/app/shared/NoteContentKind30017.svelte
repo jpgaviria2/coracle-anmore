@@ -15,8 +15,13 @@
   export let showMedia = false
   export let showEntire = false
 
-  const {title, description, location, status, currency = "SAT"} = fromPairs(note.tags)
-  const price = getTagValue("price", note.tags)
+  const {title, location, status} = fromPairs(note.tags)
+  const descriptionTag = getTagValue("description", note.tags)
+  const description = descriptionTag ? descriptionTag[1] : null
+  const priceTag = getTagValue("price", note.tags)
+  const price = priceTag ? priceTag[1] : null
+  const currencyTag = getTagValue("currency", note.tags)
+  const currency = currencyTag ? currencyTag[1] : "SAT"
   const deleted = deriveIsDeletedByAddress(repository, note)
 </script>
 
@@ -37,7 +42,7 @@
       </div>
       {#if price}
         <span class="whitespace-nowrap">
-          <CurrencySymbol code={currency} />{commaFormat(price)}
+          <CurrencySymbol code={currency} />{commaFormat(parseInt(price) || 0)}
           {currency}
         </span>
       {/if}
