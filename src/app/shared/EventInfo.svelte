@@ -22,13 +22,14 @@
   const deleted = deriveIsDeletedByAddress(repository, event)
 
   $: ({name, title, location} = fromPairs(event.tags))
-  $: end = parseInt(getTagValue("end", event.tags))
-  $: start = parseInt(getTagValue("start", event.tags))
-  $: startDate = secondsToDate(start)
-  $: endDate = secondsToDate(end)
-  $: startDateDisplay = formatTimestampAsDate(start)
-  $: endDateDisplay = formatTimestampAsDate(end)
-  $: isSingleDay = startDateDisplay === endDateDisplay
+  $: end = parseInt(getTagValue("end", event.tags) || "0")
+  $: start = parseInt(getTagValue("start", event.tags) || "0")
+  $: startDate = start > 0 ? secondsToDate(start) : null
+  $: endDate = end > 0 ? secondsToDate(end) : null
+  $: startDateDisplay = start > 0 ? formatTimestampAsDate(start) : ""
+  $: endDateDisplay = end > 0 ? formatTimestampAsDate(end) : ""
+  $: isSingleDay = startDateDisplay === endDateDisplay && startDateDisplay !== ""
+  $: hasValidDates = startDate && endDate && !isNaN(startDate.getTime()) && !isNaN(endDate.getTime())
 </script>
 
 <div class="flex flex-grow flex-col gap-2">
@@ -53,20 +54,32 @@
     </span>
   </div>
   <div class="h-px bg-neutral-600" />
-  <div class="flex items-center gap-2 text-sm text-neutral-200">
-    <i class="fa fa-clock" />
-    {#if showDate}
-      Starts on {datetimeFmt.format(startDate)} — {isSingleDay
-        ? timeFmt.format(endDate)
-        : formatTimestamp(end)}
-    {:else}
-      Starts at {timeFmt.format(startDate)} — {isSingleDay
-        ? timeFmt.format(endDate)
-        : formatTimestamp(end)}
-    {/if}
-    <span class="w-2" />
-    <i class="fa fa-location-dot" />
-    {location || "No location"}
-  </div>
+  {#if hasValidDates}
+    <div class="flex items-center gap-2 text-sm text-neutral-200">
+      <i class="fa fa-clock" />
+      {#if showDate}
+        Starts on {datetimeFmt.format(startDate)} — {isSingleDay
+          ? timeFmt.format(endDate)
+          : formatTimestamp(end)}
+      {:else}
+        Starts at {timeFmt.format(startDate)} — {isSingleDay
+          ? timeFmt.format(endDate)
+          : formatTimestamp(end)}
+      {/if}
+      <span class="w-2" />
+      <i class="fa fa-location-dot" />
+      {location || "No location"}
+    </div>
+  {:else}
+    <div class="flex items-center gap-2 text-sm text-neutral-200">
+      <i class="fa fa-exclamation-triangle" />
+      <span class="text-neutral-400">Event date information unavailable</span>
+      {#if location}
+        <span class="w-2" />
+        <i class="fa fa-location-dot" />
+        {location}
+      {/if}
+    </div>
+  {/if}
   <NoteContentKind1 showEntire showMedia={getSetting("show_media")} note={event} />
 </div>

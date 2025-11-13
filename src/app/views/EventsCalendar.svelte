@@ -37,7 +37,15 @@
     if (startTag) {
       const start = parseInt(startTag)
       if (start && start > 0) {
-        return secondsToDate(start)
+        try {
+          const date = secondsToDate(start)
+          // Validate the date is valid
+          if (date && !isNaN(date.getTime())) {
+            return date
+          }
+        } catch (e) {
+          console.warn("Invalid date for event:", event.id, e)
+        }
       }
     }
     return null
@@ -46,13 +54,17 @@
   const groupEventsByDate = (events: any[]) => {
     const grouped = new Map<string, any[]>()
     for (const event of events) {
-      const eventDate = getEventDate(event)
-      if (eventDate) {
-        const key = formatDateKey(eventDate)
-        if (!grouped.has(key)) {
-          grouped.set(key, [])
+      try {
+        const eventDate = getEventDate(event)
+        if (eventDate && !isNaN(eventDate.getTime())) {
+          const key = formatDateKey(eventDate)
+          if (!grouped.has(key)) {
+            grouped.set(key, [])
+          }
+          grouped.get(key)!.push(event)
         }
-        grouped.get(key)!.push(event)
+      } catch (e) {
+        console.warn("Error processing event:", event.id, e)
       }
     }
     return grouped
