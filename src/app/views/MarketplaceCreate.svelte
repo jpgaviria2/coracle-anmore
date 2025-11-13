@@ -22,20 +22,6 @@
 
   // Marketplace listing event kind
   const MARKETPLACE = 30017
-  import {makePow} from "src/util/pow"
-  import type {ProofOfWork} from "src/util/pow"
-  import {warn} from "src/util/logger"
-  import Button from "src/partials/Button.svelte"
-  import Content from "src/partials/Content.svelte"
-  import Field from "src/partials/Field.svelte"
-  import FlexColumn from "src/partials/FlexColumn.svelte"
-  import Heading from "src/partials/Heading.svelte"
-  import Input from "src/partials/Input.svelte"
-  import {showInfo, showPublishInfo, showToast, showWarning} from "src/partials/Toast.svelte"
-  import EditorContent from "src/app/editor/EditorContent.svelte"
-  import {makeEditor} from "src/app/editor"
-  import {router} from "src/app/util/router"
-  import {env, getClientTags, sign, userSettings, broadcastUserRelays} from "src/engine"
 
   const uploading = writable(false)
   const nsecWarning = writable(null)
