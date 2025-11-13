@@ -126,6 +126,14 @@
   $: firstDay = getFirstDayOfMonth(currentDate)
   $: monthYear = getMonthYear(currentDate)
   $: today = new Date()
+  $: eventsForMonth = Array.from(eventsByDate.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .filter(([key]) => {
+      const [year, month] = key.split("-").map(Number)
+      return (
+        year === currentDate.getFullYear() && month === currentDate.getMonth() + 1
+      )
+    })
 </script>
 
 <Content size="lg">
@@ -203,15 +211,7 @@
           <p class="text-neutral-400">No events scheduled for this month.</p>
         {:else}
           <FlexColumn class="gap-4">
-            {#each Array.from(eventsByDate.entries())
-              .sort(([a], [b]) => a.localeCompare(b))
-              .filter(([key]) => {
-                const [year, month] = key.split("-").map(Number)
-                return (
-                  year === currentDate.getFullYear() && month === currentDate.getMonth() + 1
-                )
-              }) as [string, any[]]}
-              {@const [dateKey, events] = item}
+            {#each eventsForMonth as [dateKey, events]}
               {@const [year, month, day] = dateKey.split("-").map(Number)}
               {@const date = new Date(year, month - 1, day)}
               <div>
