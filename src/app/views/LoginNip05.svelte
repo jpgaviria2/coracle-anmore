@@ -34,10 +34,25 @@
 
     try {
       // Resolve NIP-05 to pubkey
-      const pubkey = await parsePubkey(nip05.trim())
+      // Note: This will fail with CORS/404 if NIP-05 domain isn't configured yet
+      // That's OK - we'll just prompt for nsec entry instead
+      let pubkey
+      try {
+        pubkey = await parsePubkey(nip05.trim())
+      } catch (e) {
+        // NIP-05 lookup failed (domain not configured or CORS issue)
+        // This is expected during development - prompt for nsec entry
+        console.warn("NIP-05 lookup failed (expected if domain not configured):", e)
+        savingNsec = true
+        showInfo("NIP-05 domain not configured yet. Please enter your nsec to save it securely.")
+        return
+      }
       
       if (!pubkey) {
-        return showWarning("Could not resolve NIP-05 identifier. Please check it's correct.")
+        // NIP-05 exists but couldn't resolve - prompt for nsec
+        savingNsec = true
+        showInfo("Could not resolve NIP-05 identifier. Please enter your nsec to save it securely.")
+        return
       }
 
       // Check if we have encrypted nsec stored

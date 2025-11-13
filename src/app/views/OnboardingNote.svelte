@@ -8,6 +8,7 @@
   import EditorContent from "src/app/editor/EditorContent.svelte"
   import Button from "src/partials/Button.svelte"
   import {makeEditor} from "src/app/editor"
+  import {env} from "src/engine"
 
   export let state
   export let signup
@@ -26,7 +27,13 @@
       // Publish our welcome note
       if (content) {
         const relays = Router.get().FromUser().policy(addMaximalFallbacks).getUrls()
-        const tags = [...editor.storage.nostr.getEditorTags(), ["t", "anmore"]] // Add default hashtag
+        const tags = [...editor.storage.nostr.getEditorTags()]
+        
+        // Add default hashtag to all new content
+        if (env.DEFAULT_HASHTAG) {
+          tags.push(["t", env.DEFAULT_HASHTAG])
+        }
+        
         const template = makeEvent(NOTE, {content, tags})
         const event = await makePow(own(template, state.pubkey), 20).result
 
@@ -44,9 +51,6 @@
     autofocus: true,
     content: "Hello world! #introductions",
   })
-  
-  // Add default hashtag to onboarding note
-  editor.storage.nostr.setEditorTags([["t", "anmore"]])
 
   let loading = false
 
