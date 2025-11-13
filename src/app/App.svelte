@@ -17,6 +17,7 @@
   import * as nostr from "src/util/nostr"
   import {ready} from "src/engine"
   import * as engine from "src/engine"
+  import {initAdmin} from "src/engine/admin"
   import * as domain from "src/domain"
   import {loadUserData} from "src/app/state"
   import {themeVariables, appName} from "src/partials/state"
@@ -50,6 +51,7 @@
   import Login from "src/app/views/Login.svelte"
   import LoginBunker from "src/app/views/LoginBunker.svelte"
   import LoginConnect from "src/app/views/LoginConnect.svelte"
+  import LoginNip05 from "src/app/views/LoginNip05.svelte"
   import Logout from "src/app/views/Logout.svelte"
   import MediaDetail from "src/app/views/MediaDetail.svelte"
   import NoteCreate from "src/app/views/NoteCreate.svelte"
@@ -69,6 +71,8 @@
   import RelayReview from "src/app/views/RelayReview.svelte"
   import ReportCreate from "src/app/views/ReportCreate.svelte"
   import Search from "src/app/views/Search.svelte"
+  import ServicesDirectory from "src/app/views/ServicesDirectory.svelte"
+  import ServiceCreate from "src/app/views/ServiceCreate.svelte"
   import ThreadDetail from "src/app/views/ThreadDetail.svelte"
   import UserContent from "src/app/views/UserContent.svelte"
   import UserData from "src/app/views/UserData.svelte"
@@ -79,6 +83,8 @@
   import UserProfile from "src/app/views/UserProfile.svelte"
   import UserSettings from "src/app/views/UserSettings.svelte"
   import Zap from "src/app/views/Zap.svelte"
+  import AdminDashboard from "src/app/views/AdminDashboard.svelte"
+  import AdminHashtags from "src/app/views/AdminHashtags.svelte"
   import {onMount} from "svelte"
   import {logUsage} from "src/app/state"
   import {
@@ -167,6 +173,7 @@
   })
 
   router.register("/login", Login)
+  router.register("/login/nip05", LoginNip05)
   router.register("/login/bunker", LoginBunker)
   router.register("/login/connect", LoginConnect, {
     requireUser: true,
@@ -305,6 +312,18 @@
   })
   router.register("/settings/relays", RelayList)
 
+  router.register("/services", ServicesDirectory)
+  router.register("/services/create", ServiceCreate, {
+    requireSigner: true,
+  })
+
+  router.register("/admin", AdminDashboard, {
+    requireSigner: true,
+  })
+  router.register("/admin/hashtags", AdminHashtags, {
+    requireSigner: true,
+  })
+
   router.register("/zap", Zap, {
     required: ["splits"],
     serializers: {
@@ -430,6 +449,9 @@
     // Our stores are throttled by 300, so wait until they're populated
     // before loading app data
     await sleep(350)
+
+    // Initialize admin system (load hashtag whitelist)
+    await initAdmin()
 
     if ($session) {
       loadUserData()

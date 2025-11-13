@@ -154,7 +154,7 @@
         <div class="mb-4 text-lg text-accent">
           <i class="fa fa-exclamation-triangle"></i> Your inbox is not configured.
         </div>
-        In order to deliver messages, Coracle needs to know where to send them. Please visit your
+        In order to deliver messages, Anmore needs to know where to send them. Please visit your
         <a class="cursor-pointer underline" href="/settings/relays"> relay settings page</a> and set
         up your inbox relays.
       </div>

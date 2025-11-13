@@ -11,9 +11,14 @@
   import NoteContentLinks from "src/app/shared/NoteContentLinks.svelte"
   import NoteContentTopic from "src/app/shared/NoteContentTopic.svelte"
   import {router} from "src/app/util/router"
+  import {adminHashtagWhitelist} from "src/engine/admin"
+  import {filterHashtags} from "src/util/nostr"
 
   export let note, showEntire
   export let showMedia = false
+
+  $: topics = getTopicTagValues(note.tags)
+  $: filteredTopics = filterHashtags(topics, $adminHashtagWhitelist)
 
   let content
   const regex = /(nostr:)?n(event|ote|pub|profile|addr)\w{10,1000}/g
@@ -82,7 +87,7 @@
     <NoteContentLinks urls={[image]} showMedia />
   {/if}
   <div>
-    {#each getTopicTagValues(note.tags) as topic}
+    {#each filteredTopics as topic}
       <NoteContentTopic value={topic}>
         <Chip class="mb-2 mr-2 inline-block cursor-pointer">#{topic}</Chip>
       </NoteContentTopic>

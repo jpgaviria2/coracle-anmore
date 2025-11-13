@@ -49,7 +49,7 @@
       </Input>
       <div slot="info">
         Enter a <Link class="underline" external href={nip05Url}>NIP-05</Link> address to verify your
-        public key.
+        public key. Get your @anmore.me identifier for simplified login.
       </div>
     </Field>
     <Field label="Lightning address">

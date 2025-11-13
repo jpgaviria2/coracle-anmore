@@ -11,6 +11,7 @@
   import {slowConnections, menuIsOpen} from "src/app/state"
   import {router} from "src/app/util/router"
   import {hasNewMessages, hasNewNotifications} from "src/engine"
+  import {isCurrentUserAdmin} from "src/engine/admin"
 
   const closeSubMenu = () => {
     subMenu = null
@@ -88,6 +89,14 @@
       <MenuMobileItem modal disabled={!$signer} href="/groups" on:click={closeMenu}>
         <i class="fa fa-circle-nodes" /> Groups
       </MenuMobileItem>
+      <MenuMobileItem href="/services" on:click={closeMenu}>
+        <i class="fa fa-briefcase" /> Services
+      </MenuMobileItem>
+      {#if $isCurrentUserAdmin}
+        <MenuMobileItem modal disabled={!$signer} href="/admin" on:click={closeMenu}>
+          <i class="fa fa-shield" /> Admin
+        </MenuMobileItem>
+      {/if}
       <MenuMobileItem disabled={!$signer} href="/channels" on:click={closeMenu}>
         <i class="fa fa-message" />
         <div class="relative inline-block">

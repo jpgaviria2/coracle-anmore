@@ -24,7 +24,7 @@
   import NoteOptions from "src/app/shared/NoteOptions.svelte"
   import NsecWarning from "src/app/shared/NsecWarning.svelte"
   import {drafts} from "src/app/state"
-  import {getClientTags, sign, broadcastUserRelays, userSettings} from "src/engine"
+  import {getClientTags, sign, broadcastUserRelays, userSettings, env} from "src/engine"
   import {makeEditor} from "src/app/editor"
 
   export let parent
@@ -100,6 +100,11 @@
     const parentTags = kind === NOTE ? tagEventForReply(parent) : tagEventForComment(parent)
     const editorTags = editor.storage.nostr.getEditorTags()
     const tags = uniqTags([...editorTags, ...parentTags, ...getClientTags()])
+    
+    // Add default hashtag to all new content
+    if (env.DEFAULT_HASHTAG) {
+      tags.push(["t", env.DEFAULT_HASHTAG])
+    }
     const draft = editor.getJSON()
 
     if (options.warning) {

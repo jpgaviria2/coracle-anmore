@@ -10,6 +10,9 @@
   import Heading from "src/partials/Heading.svelte"
   import {router} from "src/app/util/router"
   import {boot} from "src/app/state"
+  import {env} from "src/engine"
+
+  const useNip05 = () => router.at("login/nip05").pushModal()
 
   // Define the interface for AppInfo
   interface AppInfo {
@@ -61,8 +64,11 @@
       </p>
     </div>
     <div class="relative flex flex-col gap-4">
+      <Button class="btn btn-tall btn-accent" on:click={useNip05}>
+        <i class="fa fa-at" /> Log In with NIP-05 (@{env.NIP05_DOMAIN})
+      </Button>
       {#if getNip07()}
-        <Button class="btn btn-tall btn-accent" on:click={useExtension}>
+        <Button class="btn btn-tall" on:click={useExtension}>
           <i class="fa fa-puzzle-piece" /> Use Browser Extension
         </Button>
       {/if}

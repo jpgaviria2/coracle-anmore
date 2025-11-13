@@ -1,8 +1,8 @@
 # What is this?
 
-Coracle is a web client for the Nostr protocol focused on pushing the boundaries of what's unique about nostr, including relay selection and management, web-of-trust based moderation and content recommendations, and privacy protection. Check it out at [coracle.social](https://coracle.social).
+Anmore is an admin-controlled Nostr platform with enhanced moderation capabilities, simplified authentication using NIP-05, and automatic hashtag generation. Built on the Coracle codebase, Anmore provides a curated social experience with admin-managed content filtering.
 
-If you like Coracle and want to support its development, you can donate sats via [Geyser](https://geyser.fund/project/coracle).
+Check it out at [anmore.me](https://anmore.me).
 
 # Features
 
@@ -57,14 +57,14 @@ If you like Coracle and want to support its development, you can donate sats via
 
 You can find a more complete changelog [here](./CHANGELOG.md).
 
-# Run Coracle locally:
+# Run Anmore locally:
 
-- Clone the project repository: `git clone https://github.com/coracle-social/coracle.git`
-- Navigate to the project directory: `cd coracle`
+- Clone the project repository: `git clone https://github.com/anmore/anmore.git`
+- Navigate to the project directory: `cd anmore`
 - Install dependencies: `pnpm i`
-- Customize configuration in `.env` (optional, see below)
+- Install sharp (required for build): `pnpm i sharp --include=optional`
+- Copy `.env.example` to `.env.local` and customize configuration (optional, see below)
 - Start the development server: `pnpm run dev`
-- In order for `pnpm run build` to work, you'll need to run `pnpm i sharp --include=optional` first.
 
 # Tests
 
@@ -86,7 +86,15 @@ Source maps are uploaded using the sentry cli to a self-hosted glitchtip instanc
 
 # Customization
 
-Coracle is intended to be fully white-labeled by groups of various kinds. The following environment variables can be set in `.env.local` to customize Coracle's appearance and behavior:
+Anmore is fully customizable via environment variables. The following environment variables can be set in `.env.local` to customize Anmore's appearance and behavior:
+
+## Anmore-Specific Variables
+
+- `VITE_ADMIN_PUBKEYS` is a comma-separated list of hex pubkeys for admin users who can manage hashtag whitelists.
+- `VITE_DEFAULT_HASHTAG` is the default hashtag automatically added to all new posts (default: "anmore").
+- `VITE_NIP05_DOMAIN` is the NIP-05 domain for simplified login (default: "anmore.me").
+
+## General Customization
 
 - `VITE_DARK_THEME` and `VITE_LIGHT_THEME` are comma-separate lists of key/value pairs defining theme colors.
 - `VITE_DVM_RELAYS` is a comma-separated list of relays to use when making requests against DVMs.
@@ -112,4 +120,16 @@ Coracle is intended to be fully white-labeled by groups of various kinds. The fo
 - `VITE_LOG_LEVEL` can be set to `info`, `warn`, or `error`. This controls how much shows up in the console.
 - `VITE_ENABLE_MARKET` can be set to `false` to disable the marketplace tab.
 
-See `.env` for default values.
+## GitHub Pages Deployment
+
+Anmore is configured for automatic deployment to GitHub Pages. The deployment workflow (`.github/workflows/deploy.yml`) will:
+
+1. Build the application on push to `main` or `master` branch
+2. Deploy to GitHub Pages automatically
+
+To enable GitHub Pages:
+1. Go to your repository Settings → Pages
+2. Set Source to "GitHub Actions"
+3. The workflow will deploy automatically on push
+
+The `CNAME` file is configured for `anmore.me` - update it if using a different domain.

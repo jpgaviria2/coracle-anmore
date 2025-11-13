@@ -23,6 +23,7 @@
   import {slowConnections} from "src/app/state"
   import {router} from "src/app/util/router"
   import {hasNewMessages, hasNewNotifications} from "src/engine"
+  import {isCurrentUserAdmin} from "src/engine/admin"
 
   const {page} = router
 
@@ -75,7 +76,7 @@
 </script>
 
 <div class="bottom-sai left-sai top-sai fixed z-sidebar w-72 bg-tinted-700 transition-colors">
-  <Link external class="mb-4 mt-4 flex items-center gap-2 px-6" href="https://info.coracle.social">
+  <Link external class="mb-4 mt-4 flex items-center gap-2 px-6" href="https://anmore.me">
     <img
       alt="App Logo"
       src={$theme === "dark"
@@ -117,6 +118,10 @@
     </div>
   </MenuDesktopItem>
   <MenuDesktopItem modal path="/groups" disabled={!$signer}>Groups</MenuDesktopItem>
+  <MenuDesktopItem modal path="/services">Services</MenuDesktopItem>
+  {#if $isCurrentUserAdmin}
+    <MenuDesktopItem modal path="/admin" disabled={!$signer}>Admin</MenuDesktopItem>
+  {/if}
   <FlexColumn small class="absolute bottom-0 w-72">
     <Button
       class="staatliches px-8 text-start text-tinted-400 hover:text-tinted-100"

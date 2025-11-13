@@ -94,6 +94,7 @@ export const headerlessKinds = [
 
 export const appDataKeys = {
   USER_SETTINGS: "nostr-engine/User/settings/v1",
+  ADMIN_HASHTAG_WHITELIST: "anmore/Admin/hashtag-whitelist/v1",
 }
 
 export const toHex = (data: string): string | null => {
@@ -193,4 +194,15 @@ export const parsePubkey = async entity => {
 
   if (result.type === "npub") return result.data
   if (result.type === "nprofile") return result.data.pubkey
+}
+
+// Filter hashtags based on admin whitelist (whitelist-only approach)
+export const filterHashtags = (topics: string[], whitelist: Set<string>): string[] => {
+  if (!whitelist || whitelist.size === 0) {
+    // If no whitelist is set, show all hashtags
+    return topics
+  }
+  
+  // Only return hashtags that are in the whitelist
+  return topics.filter(topic => whitelist.has(topic.toLowerCase()))
 }

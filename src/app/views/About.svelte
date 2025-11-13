@@ -20,8 +20,8 @@
 
 <FlexColumn class="gap-8">
   <div class="flex flex-col items-center justify-center">
-    <Heading>Coracle</Heading>
-    <h2 class="m-auto text-center">A Nostr client for feeds that puts relays first.</h2>
+    <Heading>Anmore</Heading>
+    <h2 class="m-auto text-center">An admin-controlled Nostr platform with enhanced moderation and simplified authentication.</h2>
     {#if hash}
       <p class="mt-1 text-xs">Running build {hash.slice(0, 8)}</p>
     {/if}
@@ -44,7 +44,7 @@
           <Link
             class="btn btn-accent"
             external
-            href="https://github.com/coracle-social/coracle/issues/new">
+            href="https://github.com/anmore/anmore/issues/new">
             Open an Issue
           </Link>
         </div>
@@ -61,14 +61,14 @@
     <p class="flex justify-center gap-4">
       <Popover triggerType="mouseenter">
         <div slot="trigger">
-          <Link external href="https://github.com/coracle-social/coracle"
+          <Link external href="https://github.com/anmore/anmore"
             ><i class="fa fa-code-branch" /></Link>
         </div>
         <div slot="tooltip">Source Code</div>
       </Popover>
       <Popover triggerType="mouseenter">
         <div slot="trigger">
-          <Link external href="https://info.coracle.social">
+          <Link external href="https://anmore.me">
             <i class="fa fa-earth-americas" />
           </Link>
         </div>

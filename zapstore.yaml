@@ -1,13 +1,13 @@
-identifier: social.coracle.app
-name: Coracle
+identifier: social.anmore.app
+name: Anmore
 tags: nostr social microblogging
 changelog: CHANGELOG.md
-homepage: https://coracle.social
-description: An experimental Nostr client focused on unlocking the full potential of multiple relays. Browse, filter, zap, and create custom feeds for a curated Nostr experience.
-repository: https://github.com/coracle-social/coracle
+homepage: https://anmore.me
+description: An admin-controlled Nostr platform with enhanced moderation, simplified authentication, and automatic hashtag generation.
+repository: https://github.com/anmore/anmore
 blossom_servers:
   - https://cdn.zapstore.dev
-  - https://hbr.coracle.social
+  - https://hbr.anmore.me
 assets:
   - app-release-signed.apk
 

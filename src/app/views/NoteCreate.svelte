@@ -81,6 +81,11 @@
 
     const tags = [...editor.storage.nostr.getEditorTags(), ...getClientTags()]
 
+    // Automatically add default hashtag to all posts
+    if (env.DEFAULT_HASHTAG) {
+      tags.push(["t", env.DEFAULT_HASHTAG])
+    }
+
     if (options.warning) {
       tags.push(["content-warning", options.warning])
     }
