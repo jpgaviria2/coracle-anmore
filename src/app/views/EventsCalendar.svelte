@@ -178,7 +178,7 @@
           {@const isPast = isPastDate(day)}
           <div
             class="aspect-square border border-solid border-neutral-600 p-1"
-            class:bg-accent/20={isTodayDate}
+            style={isTodayDate ? "background-color: rgba(var(--accent-rgb), 0.2)" : ""}
             class:opacity-50={isPast}>
             <div class="flex h-full flex-col">
               <div
