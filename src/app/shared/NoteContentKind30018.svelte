@@ -13,7 +13,7 @@
   import {parseJson} from "src/util/misc"
 
   export let note
-  export let showMedia = false
+  export let showMedia = true // Enable images by default for services
   export let showEntire = false
 
   // Try to parse JSON from content field (for compatibility with other service/marketplace clients)
