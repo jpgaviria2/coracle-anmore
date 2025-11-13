@@ -1,9 +1,7 @@
 <script lang="ts">
   import {onMount} from "svelte"
-  import {EVENT_DATE, EVENT_TIME} from "@welshman/util"
-  import {makeScopeFeed, Scope} from "@welshman/feeds"
+  import {EVENT_DATE, EVENT_TIME, getTagValue} from "@welshman/util"
   import {repository} from "@welshman/app"
-  import {getTagValue} from "@welshman/util"
   import {secondsToDate, LOCALE} from "@welshman/lib"
   import {Router, addMaximalFallbacks} from "@welshman/router"
   import Content from "src/partials/Content.svelte"
@@ -12,15 +10,7 @@
   import Button from "src/partials/Button.svelte"
   import Card from "src/partials/Card.svelte"
   import EventInfo from "src/app/shared/EventInfo.svelte"
-  import {makeFeed} from "src/domain"
   import {myLoad} from "src/engine"
-
-  const eventsFeed = makeFeed({
-    definition: makeScopeFeed({
-      scope: Scope.Kind,
-      kinds: [EVENT_DATE, EVENT_TIME],
-    }),
-  })
 
   let currentDate = new Date()
   let eventsByDate = new Map<string, any[]>()
@@ -178,7 +168,8 @@
           {@const isPast = isPastDate(day)}
           <div
             class="aspect-square border border-solid border-neutral-600 p-1"
-            style={isTodayDate ? "background-color: rgba(var(--accent-rgb), 0.2)" : ""}
+            class:bg-accent={isTodayDate}
+            style={isTodayDate ? "opacity: 0.2" : ""}
             class:opacity-50={isPast}>
             <div class="flex h-full flex-col">
               <div
