@@ -10,6 +10,12 @@
   export let address = null
   export let relays = []
   export let depth = isMobile ? 2 : 5
+  // Accept but ignore entity prop (decoded from route parameter)
+  export let entity = undefined
+  // Accept but ignore other props that may be decoded from entity
+  export let identifier = undefined
+  export let pubkey = undefined
+  export let kind = undefined
 
   const event = deriveEvent(id || address, {relays})
 </script>

@@ -63,6 +63,8 @@
   import {fly} from "svelte/transition"
 
   export let pubkey
+  // Accept but ignore entity prop (decoded from route parameter)
+  export let entity = undefined
   export let relays = []
 
   const handle = deriveHandleForPubkey(pubkey)

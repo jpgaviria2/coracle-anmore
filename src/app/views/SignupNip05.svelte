@@ -3,6 +3,7 @@
   import {loginWithNip01} from "@welshman/app"
   import {generateSecretKey, getPublicKey} from "nostr-tools"
   import * as nip19 from "nostr-tools/nip19"
+  import {bytesToHex} from "@noble/hashes/utils"
   import {nsecEncode, nsecDecode} from "src/util/nostr"
   import {saveEncryptedNsec} from "src/util/password"
   import {showWarning, showInfo, showSuccess} from "src/partials/Toast.svelte"
@@ -27,6 +28,36 @@
   let npub = ""
   let showEmailOption = false
   let emailSent = false
+  let registrationSubmitted = false
+  let registrationError = ""
+
+  const registerNip05 = async (username: string, pubkey: string) => {
+    try {
+      const apiUrl = env.NIP05_API_URL || "http://localhost:3001"
+      const response = await fetch(`${apiUrl}/api/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          pubkey: pubkey,
+          domain: env.NIP05_DOMAIN,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to register NIP-05")
+      }
+
+      return data
+    } catch (error) {
+      console.error("NIP-05 registration error:", error)
+      throw error
+    }
+  }
 
   const generateKeys = async () => {
     if (!username.trim()) {
@@ -57,6 +88,26 @@
       // So we encode directly with nip19.nsecEncode
       nsec = nip19.nsecEncode(privateKey)
       npub = nip19.npubEncode(publicKey)
+
+      // Convert pubkey to hex for backend API
+      const pubkeyHex = bytesToHex(publicKey)
+
+      // Register NIP-05 with backend
+      try {
+        await registerNip05(username.trim(), pubkeyHex)
+        registrationSubmitted = true
+        registrationError = ""
+        showSuccess("NIP-05 registration submitted! Awaiting admin approval.")
+      } catch (e) {
+        registrationError = e instanceof Error ? e.message : String(e)
+        // Still allow user to continue - they can use the account locally
+        // but NIP-05 won't work until approved
+        if (registrationError.includes("already")) {
+          showWarning(registrationError)
+        } else {
+          showWarning(`Registration submission failed: ${registrationError}. You can still use your account, but NIP-05 verification will not work until approved.`)
+        }
+      }
 
       keyGenerated = true
       showInfo("Keys generated! Save your nsec securely.")
@@ -212,6 +263,21 @@ Welcome to Anmore!`)
           Store it securely and never share it with anyone.
         </p>
       </div>
+      
+      {#if registrationSubmitted}
+        <div class="mt-4 rounded-lg border border-blue-600 bg-blue-900/20 p-3">
+          <p class="text-sm text-blue-400">
+            ✓ NIP-05 registration submitted successfully! Your request is pending admin approval.
+            You can use your account now, but NIP-05 verification will work once approved.
+          </p>
+        </div>
+      {:else if registrationError}
+        <div class="mt-4 rounded-lg border border-orange-600 bg-orange-900/20 p-3">
+          <p class="text-sm text-orange-400">
+            ⚠️ {registrationError}
+          </p>
+        </div>
+      {/if}
     </div>
 
     {#if !showEmailOption && !emailSent}
