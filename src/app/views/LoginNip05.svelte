@@ -43,6 +43,7 @@
         // NIP-05 lookup failed (domain not configured or CORS issue)
         // This is expected during development - prompt for nsec entry
         console.warn("NIP-05 lookup failed (expected if domain not configured):", e)
+        loading = false
         savingNsec = true
         showInfo("NIP-05 domain not configured yet. Please enter your nsec to save it securely.")
         return
@@ -50,6 +51,7 @@
       
       if (!pubkey) {
         // NIP-05 exists but couldn't resolve - prompt for nsec
+        loading = false
         savingNsec = true
         showInfo("Could not resolve NIP-05 identifier. Please enter your nsec to save it securely.")
         return

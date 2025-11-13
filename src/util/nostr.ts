@@ -192,8 +192,12 @@ export const parseAnythingSync = entity => {
 export const parsePubkey = async entity => {
   const result = await parseAnything(entity)
 
+  if (!result) return null
+  
   if (result.type === "npub") return result.data
   if (result.type === "nprofile") return result.data.pubkey
+  
+  return null
 }
 
 // Filter hashtags based on admin whitelist (whitelist-only approach)
