@@ -3,21 +3,40 @@ describe("signup", () => {
     cy.visit("/")
   })
 
-  it("works", () => {
+  it("should complete NIP-05 signup flow", () => {
     cy.get(".cy-top-nav").contains("Log In").click()
-    cy.get(".modal").contains("Sign Up").click()
-    cy.get(".modal").contains("Let's go!").click()
-    cy.get(".modal [name=name]").type("9sd2j3e0sd")
-    cy.get(".modal").contains("Continue").click()
-    cy.get(".modal").contains("Got it").click()
-    cy.get(".modal").contains("Continue").click()
-    cy.get(".modal").contains("Continue").click()
+    cy.get(".modal").should("be.visible")
+    cy.contains("Register instead").click()
+    cy.wait(500)
+
+    // Use NIP-05 signup
+    cy.contains("Create Account with NIP-05").click()
     cy.wait(1000)
-    cy.get(".modal").contains("Skip and see your feed").click()
-    cy.get(".modal").should("not.exist")
-    cy.contains("From follows")
-    cy.get("svg.logo").click()
-    cy.get(".card").contains("Profile").click()
-    cy.get(".cy-person-name").contains("9sd2j3e0sd")
+
+    const username = `testuser${Math.random().toString(36).substring(2, 11)}`
+    const password = `TestPass${Math.random().toString(36).substring(2, 15)}!`
+
+    cy.get("input[type=text]").first().type(username)
+    cy.get("input[type=password]").eq(0).type(password)
+    cy.get("input[type=password]").eq(1).type(password)
+    cy.contains("Generate Keys").click()
+    cy.wait(2000)
+
+    cy.contains("Keys Generated Successfully!", {timeout: 10000}).should("be.visible")
+    cy.contains("I've Saved My Keys - Continue").click()
+    cy.wait(2000)
+
+    cy.get(".modal", {timeout: 15000}).should("not.exist")
+    cy.contains("Don't have an account?").should("not.exist")
+  })
+
+  it("should still support njump/nstart fallback option", () => {
+    cy.get(".cy-top-nav").contains("Log In").click()
+    cy.get(".modal").should("be.visible")
+    cy.contains("Register instead").click()
+    cy.wait(500)
+
+    // Verify njump option is still available
+    cy.contains("Use nstart").should("be.visible")
   })
 })
