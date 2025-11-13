@@ -42,7 +42,6 @@
 
     const tags = [
       ["title", title.trim()],
-      ["description", content],
       ["t", env.DEFAULT_HASHTAG || "anmore"], // Add default hashtag
       ...getClientTags(),
     ]

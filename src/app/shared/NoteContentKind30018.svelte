@@ -15,8 +15,6 @@
   export let showEntire = false
 
   const {service_name, location, rate_type, availability, contact} = fromPairs(note.tags)
-  const descriptionTag = getTagValue("description", note.tags)
-  const description = descriptionTag ? descriptionTag[1] : null
   const rateTag = getTagValue("rate", note.tags)
   const rate = rateTag ? rateTag[1] : null
   const deleted = deriveIsDeletedByAddress(repository, note)
@@ -53,9 +51,6 @@
         <i class="fa fa-clock" />
         {availability}
       </div>
-    {/if}
-    {#if description && description !== note.content}
-      <p class="text-neutral-200">{description}</p>
     {/if}
     <div class="h-px bg-neutral-600" />
     <NoteContentKind1 {note} {showEntire} {showMedia} />

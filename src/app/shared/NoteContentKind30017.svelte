@@ -16,8 +16,6 @@
   export let showEntire = false
 
   const {title, location, status} = fromPairs(note.tags)
-  const descriptionTag = getTagValue("description", note.tags)
-  const description = descriptionTag ? descriptionTag[1] : null
   const priceTag = getTagValue("price", note.tags)
   const price = priceTag ? priceTag[1] : null
   const currencyTag = getTagValue("currency", note.tags)
@@ -52,9 +50,6 @@
         <i class="fa fa-location-dot" />
         {location}
       </div>
-    {/if}
-    {#if description && description !== note.content}
-      <p class="text-neutral-200">{description}</p>
     {/if}
     <div class="h-px bg-neutral-600" />
     <NoteContentKind1 {note} {showEntire} {showMedia} />
