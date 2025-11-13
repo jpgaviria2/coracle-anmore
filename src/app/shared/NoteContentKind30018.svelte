@@ -8,6 +8,7 @@
   import Chip from "src/partials/Chip.svelte"
   import NoteContentTopics from "src/app/shared/NoteContentTopics.svelte"
   import NoteContentKind1 from "src/app/shared/NoteContentKind1.svelte"
+  import NoteContentLinks from "src/app/shared/NoteContentLinks.svelte"
   import {commaFormat} from "src/util/misc"
   import {parseJson} from "src/util/misc"
 
@@ -15,7 +16,7 @@
   export let showMedia = false
   export let showEntire = false
 
-  // Try to parse JSON from content field (for compatibility with other service clients)
+  // Try to parse JSON from content field (for compatibility with other service/marketplace clients)
   let jsonData = null
   try {
     if (note.content && note.content.trim().startsWith("{")) {
@@ -26,14 +27,20 @@
   }
 
   // Get data from tags (our format) or from JSON (other clients' format)
+  // Support both service format (30018) and marketplace format (30017) JSON
   const {service_name: serviceNameTag, location: locationTag, rate_type, availability: availabilityTag, contact} = fromPairs(note.tags)
   const rateTag = getTagValue("rate", note.tags)
+  const priceTag = getTagValue("price", note.tags)
 
-  const serviceName = jsonData?.name || serviceNameTag || jsonData?.service_name || "Untitled Service"
+  // Handle both service and marketplace JSON formats
+  const serviceName = jsonData?.name || serviceNameTag || jsonData?.service_name || jsonData?.title || "Untitled Service"
   const location = jsonData?.location || locationTag || null
-  const rate = jsonData?.rate || jsonData?.price || (rateTag ? rateTag[1] : null)
+  // Support both rate (services) and price (marketplace)
+  const rate = jsonData?.rate || jsonData?.price || jsonData?.cost || (rateTag ? rateTag[1] : null) || (priceTag ? priceTag[1] : null)
   const availability = jsonData?.availability || availabilityTag || null
   const description = jsonData?.description || null
+  // Extract image URLs from JSON (could be in images array or single image field)
+  const imageUrls = jsonData?.images ? (Array.isArray(jsonData.images) ? jsonData.images : [jsonData.images]) : []
 
   const deleted = deriveIsDeletedByAddress(repository, note)
 </script>
@@ -72,19 +79,24 @@
     {/if}
     <div class="h-px bg-neutral-600" />
     {#if jsonData}
-      <!-- If content is JSON, show formatted description instead of raw JSON -->
+      <!-- If content is JSON, show formatted description and images -->
       <div class="text-neutral-200">
         {#if description}
-          <p class="whitespace-pre-wrap">{description}</p>
+          <p class="whitespace-pre-wrap mb-4">{description}</p>
         {/if}
-        {#if jsonData.images && jsonData.images.length > 0}
-          <div class="mt-2 text-sm text-neutral-400">
-            <i class="fa fa-image" /> {jsonData.images.length} image{jsonData.images.length > 1 ? "s" : ""} available
+        {#if imageUrls.length > 0}
+          <div class="my-4">
+            <NoteContentLinks urls={imageUrls} {showMedia} />
           </div>
         {/if}
         {#if jsonData.stall_id}
           <div class="mt-2 text-xs text-neutral-500">
             Stall ID: {jsonData.stall_id}
+          </div>
+        {/if}
+        {#if jsonData.shipping && jsonData.shipping.length > 0}
+          <div class="mt-2 text-sm text-neutral-400">
+            <i class="fa fa-truck" /> Shipping options available
           </div>
         {/if}
       </div>
