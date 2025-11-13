@@ -66,16 +66,6 @@
       <MenuMobileItem stopPropagation on:click={openSettings}>
         <i class="fa fa-cog" /> Settings
       </MenuMobileItem>
-      <MenuMobileItem href="/settings/relays" disabled={!$signer} on:click={closeMenu}>
-        <i class="fa fa-server" />
-        <div class="relative inline-block">
-          Relays
-          {#if $slowConnections.length > 0}
-            <div
-              class="absolute -right-2 top-0 h-2 w-2 rounded border border-solid border-white bg-accent" />
-          {/if}
-        </div>
-      </MenuMobileItem>
       <MenuMobileItem disabled={!$signer} href="/notifications" on:click={closeMenu}>
         <i class="fa fa-bell" />
         <div class="relative inline-block">
@@ -86,11 +76,24 @@
           {/if}
         </div>
       </MenuMobileItem>
-      <MenuMobileItem modal disabled={!$signer} href="/groups" on:click={closeMenu}>
-        <i class="fa fa-circle-nodes" /> Groups
+      <MenuMobileItem disabled={!$signer} href="/channels" on:click={closeMenu}>
+        <i class="fa fa-message" />
+        <div class="relative inline-block">
+          Messages
+          {#if $hasNewMessages}
+            <div
+              class="absolute -right-2 top-0 h-2 w-2 rounded border border-solid border-white bg-accent" />
+          {/if}
+        </div>
       </MenuMobileItem>
       <MenuMobileItem href="/services" on:click={closeMenu}>
         <i class="fa fa-briefcase" /> Services
+      </MenuMobileItem>
+      <MenuMobileItem href="/marketplace" on:click={closeMenu}>
+        <i class="fa fa-store" /> Marketplace
+      </MenuMobileItem>
+      <MenuMobileItem href="/events" on:click={closeMenu}>
+        <i class="fa fa-calendar" /> Events
       </MenuMobileItem>
       {#if $isCurrentUserAdmin}
         <MenuMobileItem modal disabled={!$signer} href="/admin" on:click={closeMenu}>
@@ -130,6 +133,16 @@
       {/if}
       <MenuMobileItem on:click={toggleTheme} on:click={closeMenu}>
         <i class="fa fa-palette" /> Theme
+      </MenuMobileItem>
+      <MenuMobileItem disabled={!$signer} href="/settings/relays" on:click={closeMenu}>
+        <i class="fa fa-server" />
+        <div class="relative inline-block">
+          Relays
+          {#if $slowConnections.length > 0}
+            <div
+              class="absolute -right-2 top-0 h-2 w-2 rounded border border-solid border-white bg-accent" />
+          {/if}
+        </div>
       </MenuMobileItem>
       <MenuMobileItem disabled={!$signer} href="/settings/data" on:click={closeMenu}>
         <i class="fa fa-database" /> Database

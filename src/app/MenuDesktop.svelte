@@ -85,17 +85,6 @@
   </Link>
   <MenuDesktopItem path="/notes" isActive={isFeedPage || isListPage}>Feeds</MenuDesktopItem>
   <MenuDesktopItem
-    path="/settings/relays"
-    disabled={!$signer}
-    isActive={$page?.path.startsWith("/settings/relays")}>
-    <div class="relative inline-block">
-      Relays
-      {#if $slowConnections.length > 0}
-        <div class="absolute -right-2.5 top-1 h-1.5 w-1.5 rounded bg-accent" />
-      {/if}
-    </div>
-  </MenuDesktopItem>
-  <MenuDesktopItem
     path="/notifications"
     disabled={!$signer}
     isActive={$page?.path.startsWith("/notifications")}>
@@ -117,8 +106,9 @@
       {/if}
     </div>
   </MenuDesktopItem>
-  <MenuDesktopItem modal path="/groups" disabled={!$signer}>Groups</MenuDesktopItem>
   <MenuDesktopItem modal path="/services">Services</MenuDesktopItem>
+  <MenuDesktopItem modal path="/marketplace">Marketplace</MenuDesktopItem>
+  <MenuDesktopItem modal path="/events">Events</MenuDesktopItem>
   {#if $isCurrentUserAdmin}
     <MenuDesktopItem modal path="/admin" disabled={!$signer}>Admin</MenuDesktopItem>
   {/if}
@@ -135,6 +125,17 @@
       <MenuDesktopSecondary onEscape={closeSubMenu}>
         <MenuItem class="staatliches flex items-center gap-4 py-4 pl-8" on:click={toggleTheme}>
           <i class="fa fa-palette" /> Toggle Theme
+        </MenuItem>
+        <MenuItem
+          class="staatliches flex items-center gap-4 py-4 pl-8"
+          href="/settings/relays"
+          disabled={!$signer}>
+          <div class="relative inline-block">
+            <i class="fa fa-server" /> Relays
+            {#if $slowConnections.length > 0}
+              <div class="absolute -right-2.5 top-1 h-1.5 w-1.5 rounded bg-accent" />
+            {/if}
+          </div>
         </MenuItem>
         <MenuItem
           class="staatliches flex items-center gap-4 py-4 pl-8"

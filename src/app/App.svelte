@@ -74,6 +74,9 @@
   import Search from "src/app/views/Search.svelte"
   import ServicesDirectory from "src/app/views/ServicesDirectory.svelte"
   import ServiceCreate from "src/app/views/ServiceCreate.svelte"
+  import MarketplaceDirectory from "src/app/views/MarketplaceDirectory.svelte"
+  import MarketplaceCreate from "src/app/views/MarketplaceCreate.svelte"
+  import EventsCalendar from "src/app/views/EventsCalendar.svelte"
   import ThreadDetail from "src/app/views/ThreadDetail.svelte"
   import UserContent from "src/app/views/UserContent.svelte"
   import UserData from "src/app/views/UserData.svelte"
@@ -318,6 +321,13 @@
   router.register("/services/create", ServiceCreate, {
     requireSigner: true,
   })
+
+  router.register("/marketplace", MarketplaceDirectory)
+  router.register("/marketplace/create", MarketplaceCreate, {
+    requireSigner: true,
+  })
+
+  router.register("/events", EventsCalendar)
 
   router.register("/admin", AdminDashboard, {
     requireSigner: true,
