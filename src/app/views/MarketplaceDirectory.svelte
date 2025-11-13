@@ -1,5 +1,6 @@
 <script lang="ts">
-  import {makeKindFeed} from "@welshman/feeds"
+  import {makeKindFeed, makeIntersectionFeed} from "@welshman/feeds"
+  import {CLASSIFIED} from "@welshman/util"
   import {signer} from "@welshman/app"
   import Feed from "src/app/shared/Feed.svelte"
   import Content from "src/partials/Content.svelte"
@@ -9,11 +10,14 @@
   import {router} from "src/app/util/router"
   import {makeFeed} from "src/domain"
 
-  // Marketplace listing event kind
+  // Marketplace listing event kinds
+  // Support both NIP-99 Classifieds (30402) used by Plebeian Market and custom kind 30017
   const MARKETPLACE = 30017
 
   const marketplaceFeed = makeFeed({
-    definition: makeKindFeed(MARKETPLACE),
+    definition: makeIntersectionFeed(
+      makeKindFeed(CLASSIFIED, MARKETPLACE)
+    ),
   })
 
   const createMarketplaceItem = () => router.at("marketplace/create").open()
