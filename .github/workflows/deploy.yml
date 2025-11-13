@@ -59,11 +59,46 @@ jobs:
         env:
           VITE_BUILD_HASH: ${{ github.sha }}
           VITE_BUILD_VERSION: ${{ github.ref_name }}
+          VITE_APP_NAME: Anmore
+          VITE_APP_URL: https://jpgaviria2.github.io/coracle-anmore
+          VITE_APP_DESCRIPTION: An admin-controlled Nostr platform with enhanced moderation and simplified authentication
+          VITE_APP_LOGO: /images/logo.png
+          VITE_APP_WORDMARK_DARK: /images/wordmark-dark.png
+          VITE_APP_WORDMARK_LIGHT: /images/wordmark-light.png
+          VITE_CLIENT_NAME: anmore
+          VITE_CLIENT_ID: anmore
+          VITE_DARK_THEME: accent:#3b82f6,neutral-50:#f9fafb,neutral-100:#f3f4f6,neutral-200:#e5e7eb,neutral-300:#d1d5db,neutral-400:#9ca3af,neutral-500:#6b7280,neutral-600:#4b5563,neutral-700:#374151,neutral-800:#1f2937,neutral-900:#111827,tinted-100:#f3f4f6,tinted-200:#e5e7eb,tinted-300:#d1d5db,tinted-400:#9ca3af,tinted-500:#6b7280,tinted-600:#4b5563,tinted-700:#374151
+          VITE_LIGHT_THEME: accent:#3b82f6,neutral-50:#111827,neutral-100:#1f2937,neutral-200:#374151,neutral-300:#4b5563,neutral-400:#6b7280,neutral-500:#9ca3af,neutral-600:#d1d5db,neutral-700:#e5e7eb,neutral-800:#f3f4f6,neutral-900:#f9fafb,tinted-100:#1f2937,tinted-200:#374151,tinted-300:#4b5563,tinted-400:#6b7280,tinted-500:#9ca3af,tinted-600:#d1d5db,tinted-700:#e5e7eb
+          VITE_DEFAULT_RELAYS: wss://relay.damus.io,wss://relay.snort.social,wss://nos.lol
+          VITE_SEARCH_RELAYS: wss://relay.damus.io,wss://relay.snort.social
+          VITE_INDEXER_RELAYS: wss://relay.damus.io,wss://relay.snort.social
+          VITE_DVM_RELAYS: wss://relay.damus.io
+          VITE_SIGNER_RELAYS: wss://relay.damus.io
+          VITE_ENABLE_ZAPS: true
+          VITE_ENABLE_MARKET: true
+          VITE_BLUR_CONTENT: false
+          VITE_DEFAULT_HASHTAG: anmore
+          VITE_NIP05_DOMAIN: anmore.me
+          VITE_PLATFORM_PUBKEY: 
+          VITE_PLATFORM_ZAP_SPLIT: 0.05
+          VITE_DUFFLEPUD_URL: 
+          VITE_NIP96_URLS: 
+          VITE_BLOSSOM_URLS: 
+          VITE_DEFAULT_FOLLOWS: 
+          VITE_ONBOARDING_LISTS: 
+          VITE_LOG_LEVEL: info
         run: |
           NODE_OPTIONS=--max_old_space_size=16384 pnpm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
+
+      - name: List build output
+        run: |
+          echo "Build output contents:"
+          ls -la dist/ || echo "dist folder not found"
+          echo "Checking for index.html:"
+          ls -la dist/index.html || echo "index.html not found"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
