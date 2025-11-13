@@ -49,11 +49,13 @@
 
     try {
       // Generate new key pair
-      const privateKey = generateSecretKey()
+      const privateKey = generateSecretKey() // Returns Uint8Array
       const publicKey = getPublicKey(privateKey)
 
       // Encode to nsec and npub
-      nsec = nsecEncode(privateKey)
+      // nsecEncode expects hex string, but generateSecretKey returns Uint8Array
+      // So we encode directly with nip19.nsecEncode
+      nsec = nip19.nsecEncode(privateKey)
       npub = nip19.npubEncode(publicKey)
 
       keyGenerated = true
