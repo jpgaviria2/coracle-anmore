@@ -1,7 +1,7 @@
 <script lang="ts">
   import {onMount} from "svelte"
   import {loginWithNip01} from "@welshman/app"
-  import {generatePrivateKey, getPublicKey} from "nostr-tools"
+  import {generateSecretKey, getPublicKey} from "nostr-tools"
   import * as nip19 from "nostr-tools/nip19"
   import {nsecEncode} from "src/util/nostr"
   import {saveEncryptedNsec} from "src/util/password"
@@ -49,7 +49,7 @@
 
     try {
       // Generate new key pair
-      const privateKey = generatePrivateKey()
+      const privateKey = generateSecretKey()
       const publicKey = getPublicKey(privateKey)
 
       // Encode to nsec and npub
