@@ -11,9 +11,11 @@
     ZAP_RESPONSE,
   } from "@welshman/util"
   import {repository} from "@welshman/app"
-  import {repostKinds, reactionKinds} from "src/util/nostr"
+  import {repostKinds, reactionKinds, hasWhitelistedHashtag} from "src/util/nostr"
   import {isEventMuted, myLoad} from "src/engine"
   import {getValidZap} from "src/app/util"
+  import {adminHashtagWhitelist, getAdminPubkeys} from "src/engine/admin"
+  import {get} from "svelte/store"
 
   type GetContext = (event: TrustedEvent) => TrustedEvent[]
   type ShouldAddEvent = (event: TrustedEvent, getContext: GetContext) => boolean
@@ -36,6 +38,15 @@
     if (!showDeleted && repository.isDeleted(event)) return true
     if (hideReplies && getParentIdOrAddr(event)) return true
     if (timestamps.has(getIdOrAddress(event))) return true
+
+    // Apply hashtag whitelist filtering
+    const whitelist = get(adminHashtagWhitelist)
+    if (whitelist && whitelist.size > 0) {
+      const adminPubkeys = getAdminPubkeys()
+      if (!hasWhitelistedHashtag(event, whitelist, adminPubkeys)) {
+        return true
+      }
+    }
 
     return false
   }

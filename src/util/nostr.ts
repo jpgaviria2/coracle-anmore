@@ -210,3 +210,20 @@ export const filterHashtags = (topics: string[], whitelist: Set<string>): string
   // Only return hashtags that are in the whitelist
   return topics.filter(topic => whitelist.has(topic.toLowerCase()))
 }
+
+// Check if a note has at least one whitelisted hashtag
+export const hasWhitelistedHashtag = (note: TrustedEvent, whitelist: Set<string>, adminPubkeys: Set<string>): boolean => {
+  // If no whitelist is set, show all content
+  if (!whitelist || whitelist.size === 0) {
+    return true
+  }
+  
+  // Always show content from admins (bypass filtering)
+  if (adminPubkeys.has(note.pubkey)) {
+    return true
+  }
+  
+  // Check if note has any hashtags in the whitelist
+  const topics = getTopicTagValues(note.tags)
+  return topics.some(topic => whitelist.has(topic.toLowerCase()))
+}

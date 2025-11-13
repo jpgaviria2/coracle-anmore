@@ -17,8 +17,11 @@
 
   let newHashtag = ""
   let loading = false
+  let searchQuery = ""
 
-  $: whitelist = Array.from($adminHashtagWhitelist).sort()
+  $: whitelist = Array.from($adminHashtagWhitelist)
+    .filter(h => !searchQuery || h.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort()
 
   const addHashtag = async () => {
     if (!newHashtag.trim()) return
@@ -96,7 +99,20 @@
           Add
         </Button>
       </div>
+      <p slot="info">
+        Add hashtags that should be visible in the feed. Posts without any whitelisted hashtags will be hidden.
+      </p>
     </Field>
+
+    {#if $adminHashtagWhitelist.size > 5}
+      <Field label="Search Hashtags">
+        <Input
+          type="text"
+          bind:value={searchQuery}
+          placeholder="Search hashtags..."
+        />
+      </Field>
+    {/if}
 
     <Field label="Whitelisted Hashtags ({whitelist.length})">
       {#if whitelist.length === 0}

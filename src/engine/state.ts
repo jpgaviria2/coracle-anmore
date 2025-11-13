@@ -156,7 +156,6 @@ export const env = {
   APP_URL: import.meta.env.VITE_APP_URL,
   APP_NAME: import.meta.env.VITE_APP_NAME,
   APP_LOGO: import.meta.env.VITE_APP_LOGO,
-  ADMIN_PUBKEYS: fromCsv(import.meta.env.VITE_ADMIN_PUBKEYS || "").filter(Boolean) as string[],
   DEFAULT_HASHTAG: import.meta.env.VITE_DEFAULT_HASHTAG || "anmore",
   NIP05_DOMAIN: import.meta.env.VITE_NIP05_DOMAIN || "anmore.me",
   NIP05_API_URL: import.meta.env.VITE_NIP05_API_URL || "http://localhost:3001",
