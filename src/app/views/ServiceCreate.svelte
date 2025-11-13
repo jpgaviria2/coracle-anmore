@@ -42,9 +42,18 @@
 
     const tags = [
       ["service_name", title.trim()],
-      ["t", env.DEFAULT_HASHTAG || "anmore"], // Add default hashtag
       ...getClientTags(),
     ]
+    
+    // Automatically add default hashtag (avoid duplicates)
+    const defaultHashtag = env.DEFAULT_HASHTAG || "anmore"
+    const defaultHashtagLower = defaultHashtag.toLowerCase()
+    const hasDefaultHashtag = tags.some(tag => 
+      tag[0] === "t" && tag[1]?.toLowerCase() === defaultHashtagLower
+    )
+    if (!hasDefaultHashtag) {
+      tags.push(["t", defaultHashtag])
+    }
 
     if (location.trim()) {
       tags.push(["location", location.trim()])

@@ -2,7 +2,7 @@
   import {onDestroy} from "svelte"
   import {without, dateToSeconds, uniq, now} from "@welshman/lib"
   import {NOTE, COMMENT, getPubkeyTagValues, makeEvent, uniqTags} from "@welshman/util"
-  import {Router, addMinimalFallbacks} from "@welshman/router"
+  import {Router, addMaximalFallbacks} from "@welshman/router"
   import {
     session,
     displayProfileByPubkey,
@@ -101,9 +101,19 @@
     const editorTags = editor.storage.nostr.getEditorTags()
     const tags = uniqTags([...editorTags, ...parentTags, ...getClientTags()])
     
-    // Add default hashtag to all new content
-    if (env.DEFAULT_HASHTAG) {
-      tags.push(["t", env.DEFAULT_HASHTAG])
+    // Automatically add default hashtag to all new content (avoid duplicates)
+    const defaultHashtag = (env.DEFAULT_HASHTAG || "anmore").trim()
+    if (defaultHashtag && defaultHashtag.length > 0) {
+      // Remove # prefix if present, normalize to lowercase
+      const normalizedHashtag = defaultHashtag.replace(/^#/, "").toLowerCase()
+      if (normalizedHashtag.length > 0) {
+        const hasDefaultHashtag = tags.some(tag => 
+          tag[0] === "t" && tag[1]?.toLowerCase() === normalizedHashtag
+        )
+        if (!hasDefaultHashtag) {
+          tags.push(["t", normalizedHashtag])
+        }
+      }
     }
     const draft = editor.getJSON()
 
@@ -118,8 +128,19 @@
     loading = true
     clearDraft()
 
-    const ownedEvent = own(makeEvent(kind, {content, tags, created_at: now()}), $session.pubkey)
+    // Get relays first (using a temporary event to determine relay selection)
+    const tempEvent = own(makeEvent(kind, {content, tags, created_at: now()}), $session.pubkey)
+    const relays =
+      options.relays?.length > 0
+        ? options.relays
+        : Router.get().PublishEvent(tempEvent).policy(addMaximalFallbacks).getUrls()
 
+    // Add relay recommendations to tags (some relays prefer events with relay recommendations)
+    const relayRecommendations = relays.slice(0, 8).map(url => ["r", url])
+    tags.push(...relayRecommendations)
+
+    // Create final event with all tags including relay recommendations
+    const ownedEvent = own(makeEvent(kind, {content, tags, created_at: now()}), $session.pubkey)
     let hashedEvent = hash(ownedEvent)
 
     if (options.pow_difficulty) {
@@ -128,11 +149,6 @@
 
       hashedEvent = await pow.result
     }
-
-    const relays =
-      options.relays?.length > 0
-        ? options.relays
-        : Router.get().PublishEvent(hashedEvent).policy(addMinimalFallbacks).getUrls()
 
     const thunk = publishThunk({
       relays,

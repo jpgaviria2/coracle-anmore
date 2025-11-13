@@ -26,7 +26,7 @@ import {
   shouldUnwrap,
   getFollows,
 } from "@welshman/app"
-import {makeAuthorFeed, makeScopeFeed, Scope} from "@welshman/feeds"
+import {makeAuthorFeed, makeScopeFeed, makeTagFeed, makeIntersectionFeed, makeGlobalFeed, feedFromFilter, Scope} from "@welshman/feeds"
 import {
   TaskQueue,
   groupBy,
@@ -135,6 +135,7 @@ import {
 import {SearchHelper, fromCsv, parseJson} from "src/util/misc"
 import {appDataKeys} from "src/util/nostr"
 import {derived, writable} from "svelte/store"
+import {adminHashtagWhitelist} from "src/engine/admin"
 
 export const env = {
   CLIENT_ID: import.meta.env.VITE_CLIENT_ID as string,
@@ -157,6 +158,7 @@ export const env = {
   APP_NAME: import.meta.env.VITE_APP_NAME,
   APP_LOGO: import.meta.env.VITE_APP_LOGO,
   DEFAULT_HASHTAG: import.meta.env.VITE_DEFAULT_HASHTAG || "anmore",
+  ADMIN_HASHTAG_WHITELIST: import.meta.env.VITE_ADMIN_HASHTAG_WHITELIST || "",
   NIP05_DOMAIN: import.meta.env.VITE_NIP05_DOMAIN || "anmore.me",
   NIP05_API_URL: import.meta.env.VITE_NIP05_API_URL || "http://localhost:3001",
 }
@@ -191,9 +193,29 @@ export const ensureMessagePlaintext = async (e: TrustedEvent) => {
 
 // Decrypt stuff as it comes in
 
+// Wrapper to handle decryption errors gracefully
+const safeEnsurePlaintext = async (event: TrustedEvent) => {
+  try {
+    return await ensurePlaintext(event)
+  } catch (error) {
+    // Silently skip corrupted encrypted events - this is normal when data is corrupted or encrypted with different keys
+    // Only log in development mode to reduce console noise
+    if (import.meta.env.DEV && error instanceof Error) {
+      if (error.message.includes("invalid payload length")) {
+        // These are common and expected - corrupted or incompatible encrypted data
+        // Don't spam console in production
+      } else {
+        console.warn(`Decryption failed for event ${event.id}:`, error.message)
+      }
+    }
+    // Return undefined to skip this event
+    return undefined
+  }
+}
+
 const decrypter = new TaskQueue<TrustedEvent>({
   batchSize: 10,
-  processItem: ensurePlaintext,
+  processItem: safeEnsurePlaintext,
 })
 
 const decryptKinds = [APP_DATA, FOLLOWS, MUTES]
@@ -488,12 +510,30 @@ export const userFeeds = derived([feeds, pubkey], ([$feeds, $pubkey]: [Published
   $feeds.filter(feed => feed.event.pubkey === $pubkey),
 )
 
-export const defaultFeed = derived([userFollows, userFeeds], ([$userFollows, $userFeeds]) => {
+export const defaultFeed = derived([userFollows, userFeeds, adminHashtagWhitelist], ([$userFollows, $userFeeds, $adminHashtagWhitelist]) => {
   let definition
-  if ($userFollows?.size > 0) {
-    definition = makeScopeFeed(Scope.Follows)
+  
+  // If there's a hashtag whitelist, ONLY show events with whitelisted hashtags
+  // Clear all other filters (authors, follows, etc.) - only filter by hashtag
+  if ($adminHashtagWhitelist && $adminHashtagWhitelist.size > 0) {
+    // Create tag feeds for each whitelisted hashtag
+    const hashtagFeeds = Array.from($adminHashtagWhitelist).map(tag => makeTagFeed("#t", tag))
+    
+    // Combine all hashtag feeds - events matching ANY whitelisted hashtag will be shown
+    // No author filtering - show events from anyone with the whitelisted hashtag
+    if (hashtagFeeds.length === 1) {
+      definition = hashtagFeeds[0]
+    } else {
+      // Multiple hashtags: combine with intersection (OR logic for tags)
+      definition = makeIntersectionFeed(...hashtagFeeds)
+    }
   } else {
-    definition = makeAuthorFeed(...env.DEFAULT_FOLLOWS)
+    // No whitelist: use default behavior (follows or default authors)
+    if ($userFollows?.size > 0) {
+      definition = makeScopeFeed(Scope.Follows)
+    } else {
+      definition = makeAuthorFeed(...env.DEFAULT_FOLLOWS)
+    }
   }
 
   return makeFeed({definition: normalizeFeedDefinition(definition)})

@@ -29,9 +29,15 @@
         const relays = Router.get().FromUser().policy(addMaximalFallbacks).getUrls()
         const tags = [...editor.storage.nostr.getEditorTags()]
         
-        // Add default hashtag to all new content
+        // Add default hashtag to all new content (avoid duplicates)
         if (env.DEFAULT_HASHTAG) {
-          tags.push(["t", env.DEFAULT_HASHTAG])
+          const defaultHashtagLower = env.DEFAULT_HASHTAG.toLowerCase()
+          const hasDefaultHashtag = tags.some(tag => 
+            tag[0] === "t" && tag[1]?.toLowerCase() === defaultHashtagLower
+          )
+          if (!hasDefaultHashtag) {
+            tags.push(["t", env.DEFAULT_HASHTAG])
+          }
         }
         
         const template = makeEvent(NOTE, {content, tags})

@@ -10,7 +10,7 @@
     verifyEvent,
     ZAP_RESPONSE,
   } from "@welshman/util"
-  import {repository} from "@welshman/app"
+  import {repository, pubkey} from "@welshman/app"
   import {repostKinds, reactionKinds, hasWhitelistedHashtag} from "src/util/nostr"
   import {isEventMuted, myLoad} from "src/engine"
   import {getValidZap} from "src/app/util"
@@ -40,9 +40,16 @@
     if (timestamps.has(getIdOrAddress(event))) return true
 
     // Apply hashtag whitelist filtering
+    // IMPORTANT: Always show your own posts, even if they don't have whitelisted hashtags
+    // This ensures you can see what you posted, even if it gets filtered for others
     const whitelist = get(adminHashtagWhitelist)
     if (whitelist && whitelist.size > 0) {
       const adminPubkeys = getAdminPubkeys()
+      // Always show your own posts
+      if ($pubkey && event.pubkey === $pubkey) {
+        return false
+      }
+      // Check hashtag whitelist for other posts
       if (!hasWhitelistedHashtag(event, whitelist, adminPubkeys)) {
         return true
       }

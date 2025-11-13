@@ -3,7 +3,7 @@
   import {last, dateToSeconds, now} from "@welshman/lib"
   import {own, hash} from "@welshman/signer"
   import type {TrustedEvent} from "@welshman/util"
-  import {Router, addMinimalFallbacks} from "@welshman/router"
+  import {Router, addMaximalFallbacks} from "@welshman/router"
   import {
     makeEvent,
     toNostrURI,
@@ -81,9 +81,20 @@
 
     const tags = [...editor.storage.nostr.getEditorTags(), ...getClientTags()]
 
-    // Automatically add default hashtag to all posts
-    if (env.DEFAULT_HASHTAG) {
-      tags.push(["t", env.DEFAULT_HASHTAG])
+    // Automatically add default hashtag to all posts (avoid duplicates)
+    // This ensures every post includes the default hashtag for filtering
+    const defaultHashtag = (env.DEFAULT_HASHTAG || "anmore").trim()
+    if (defaultHashtag && defaultHashtag.length > 0) {
+      // Remove # prefix if present, normalize to lowercase
+      const normalizedHashtag = defaultHashtag.replace(/^#/, "").toLowerCase()
+      if (normalizedHashtag.length > 0) {
+        const hasDefaultHashtag = tags.some(tag => 
+          tag[0] === "t" && tag[1]?.toLowerCase() === normalizedHashtag
+        )
+        if (!hasDefaultHashtag) {
+          tags.push(["t", normalizedHashtag])
+        }
+      }
     }
 
     if (options.warning) {
@@ -99,8 +110,21 @@
     }
 
     const created_at = options.publish_at ? dateToSeconds(options.publish_at) : now()
-    const ownedEvent = own(makeEvent(1, {content, tags, created_at}), $session.pubkey)
+    
+    // Get relays first (using a temporary event to determine relay selection)
+    const tempEvent = own(makeEvent(1, {content, tags, created_at}), $session.pubkey)
+    const relays =
+      options.relays?.length > 0
+        ? options.relays
+        : Router.get().PublishEvent(tempEvent).policy(addMaximalFallbacks).getUrls()
 
+    // Add relay recommendations to tags (some relays prefer events with relay recommendations)
+    // This helps other clients know where to find the event and improves relay acceptance
+    const relayRecommendations = relays.slice(0, 8).map(url => ["r", url])
+    tags.push(...relayRecommendations)
+
+    // Create final event with all tags including relay recommendations
+    const ownedEvent = own(makeEvent(1, {content, tags, created_at}), $session.pubkey)
     let hashedEvent = hash(ownedEvent)
 
     if (options.pow_difficulty) {
@@ -114,11 +138,7 @@
 
     publishing = "signing"
 
-    const signedEvent = await sign(hashedEvent, options)
-    const relays =
-      options.relays?.length > 0
-        ? options.relays
-        : Router.get().PublishEvent(signedEvent).policy(addMinimalFallbacks).getUrls()
+    const finalEvent = await sign(hashedEvent, options)
 
     let thunk: Thunk
 
@@ -129,7 +149,7 @@
       const dvmContent = await $signer.nip04.encrypt(
         SHIPYARD_PUBKEY,
         JSON.stringify([
-          ["i", JSON.stringify(signedEvent), "text"],
+          ["i", JSON.stringify(finalEvent), "text"],
           ["param", "relays", ...relays],
         ]),
       )
@@ -171,7 +191,7 @@
     } else {
       router.clearModals()
 
-      thunk = publishThunk({relays, event: signedEvent, delay: $userSettings.send_delay})
+      thunk = publishThunk({relays, event: finalEvent, delay: $userSettings.send_delay})
     }
 
     new Promise<void>(resolve => {
@@ -203,6 +223,10 @@
     if (!aborted) {
       showPublishInfo(thunk)
       broadcastUserRelays(relays)
+      
+      // Navigate to the note detail page so user can see their published note immediately
+      // The event will be in the repository from publishThunk, so it will show up
+      router.at("notes").of(finalEvent.id).open()
     }
 
     publishing = null
@@ -331,6 +355,11 @@
             <i class="fa fa-cog" />
           </button>
         </div>
+        <span slot="info" class="text-neutral-400">
+          {#if env.DEFAULT_HASHTAG}
+            The hashtag <strong>#{env.DEFAULT_HASHTAG}</strong> will be automatically added to your post.
+          {/if}
+        </span>
       </Field>
       <div class="flex gap-2">
         <Button

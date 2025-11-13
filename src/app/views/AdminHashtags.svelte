@@ -1,10 +1,6 @@
 <script lang="ts">
-  import {onMount} from "svelte"
-  import {get} from "svelte/store"
-  import {adminHashtagWhitelist, isCurrentUserAdmin} from "src/engine/admin"
-  import {signer, pubkey} from "@welshman/app"
-  import {makeEvent, APP_DATA} from "@welshman/util"
-  import {signAndPublish} from "src/engine/commands"
+  import {adminHashtagWhitelist, isCurrentUserAdmin, saveAdminHashtagWhitelist} from "src/engine/admin"
+  import {signer} from "@welshman/app"
   import {showInfo, showWarning} from "src/partials/Toast.svelte"
   import Button from "src/partials/Button.svelte"
   import Content from "src/partials/Content.svelte"
@@ -13,17 +9,15 @@
   import Heading from "src/partials/Heading.svelte"
   import Input from "src/partials/Input.svelte"
   import Chip from "src/partials/Chip.svelte"
-  import {appDataKeys} from "src/util/nostr"
 
   let newHashtag = ""
-  let loading = false
   let searchQuery = ""
 
   $: whitelist = Array.from($adminHashtagWhitelist)
     .filter(h => !searchQuery || h.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort()
 
-  const addHashtag = async () => {
+  const addHashtag = () => {
     if (!newHashtag.trim()) return
 
     const hashtag = newHashtag.trim().toLowerCase().replace(/^#/, "")
@@ -33,46 +27,22 @@
       return
     }
 
-    loading = true
     const updatedWhitelist = new Set($adminHashtagWhitelist)
     updatedWhitelist.add(hashtag)
     
-    try {
-      await publishWhitelist(updatedWhitelist)
-      adminHashtagWhitelist.set(updatedWhitelist)
-      newHashtag = ""
-      showInfo("Hashtag added to whitelist")
-    } catch (e) {
-      showWarning("Failed to add hashtag: " + e.message)
-    } finally {
-      loading = false
-    }
+    adminHashtagWhitelist.set(updatedWhitelist)
+    saveAdminHashtagWhitelist(updatedWhitelist)
+    newHashtag = ""
+    showInfo("Hashtag added to whitelist. Update VITE_ADMIN_HASHTAG_WHITELIST in .env to persist across deployments.")
   }
 
-  const removeHashtag = async (hashtag: string) => {
-    loading = true
+  const removeHashtag = (hashtag: string) => {
     const updatedWhitelist = new Set($adminHashtagWhitelist)
     updatedWhitelist.delete(hashtag)
     
-    try {
-      await publishWhitelist(updatedWhitelist)
-      adminHashtagWhitelist.set(updatedWhitelist)
-      showInfo("Hashtag removed from whitelist")
-    } catch (e) {
-      showWarning("Failed to remove hashtag: " + e.message)
-    } finally {
-      loading = false
-    }
-  }
-
-  const publishWhitelist = async (whitelist: Set<string>) => {
-    const whitelistArray = Array.from(whitelist)
-    const event = makeEvent(APP_DATA, {
-      content: JSON.stringify({hashtagWhitelist: whitelistArray}),
-      tags: [["d", appDataKeys.ADMIN_HASHTAG_WHITELIST]],
-    })
-
-    await signAndPublish(event)
+    adminHashtagWhitelist.set(updatedWhitelist)
+    saveAdminHashtagWhitelist(updatedWhitelist)
+    showInfo("Hashtag removed from whitelist. Update VITE_ADMIN_HASHTAG_WHITELIST in .env to persist across deployments.")
   }
 
   document.title = "Admin - Hashtag Management"
@@ -95,12 +65,13 @@
           placeholder="Enter hashtag (without #)"
           on:keydown={(e) => e.key === "Enter" && addHashtag()}
         />
-        <Button class="btn btn-accent" on:click={addHashtag} disabled={loading || !$signer}>
+        <Button class="btn btn-accent" on:click={addHashtag} disabled={!$signer}>
           Add
         </Button>
       </div>
       <p slot="info">
         Add hashtags that should be visible in the feed. Posts without any whitelisted hashtags will be hidden.
+        Changes are saved locally. Update VITE_ADMIN_HASHTAG_WHITELIST in .env to persist across deployments.
       </p>
     </Field>
 
@@ -124,8 +95,7 @@
               #{hashtag}
               <button
                 class="ml-1 text-accent hover:text-accent-d"
-                on:click={() => removeHashtag(hashtag)}
-                disabled={loading}>
+                on:click={() => removeHashtag(hashtag)}>
                 ×
               </button>
             </Chip>
