@@ -53,7 +53,7 @@
       const publicKey = getPublicKey(privateKey)
 
       // Encode to nsec and npub
-      nsec = nip19.nsecEncode(privateKey)
+      nsec = nsecEncode(privateKey)
       npub = nip19.npubEncode(publicKey)
 
       keyGenerated = true
