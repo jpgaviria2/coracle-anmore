@@ -2,8 +2,11 @@
   import {now} from "@welshman/lib"
   import {own, hash} from "@welshman/signer"
   import {Router, addMinimalFallbacks} from "@welshman/router"
-  import {makeEvent, CLASSIFIED} from "@welshman/util"
+  import {makeEvent} from "@welshman/util"
   import {session, publishThunk, tagPubkey} from "@welshman/app"
+
+  // Service offering event kind
+  const SERVICE = 30018
   import {writable} from "svelte/store"
   import {makePow} from "src/util/pow"
   import type {ProofOfWork} from "src/util/pow"
@@ -38,9 +41,8 @@
     if (!skipNsecWarning && content.match(/\bnsec1.+/)) return nsecWarning.set(true)
 
     const tags = [
-      ["title", title.trim()],
-      ["summary", summary.trim() || title.trim()],
-      ["t", "service"], // Mark as service
+      ["service_name", title.trim()],
+      ["description", content],
       ["t", env.DEFAULT_HASHTAG || "anmore"], // Add default hashtag
       ...getClientTags(),
     ]
@@ -50,23 +52,26 @@
     }
 
     if (price.trim()) {
-      tags.push(["price", price.trim(), "SAT"])
-    }
-
-    if (category.trim()) {
-      tags.push(["category", category.trim()])
+      tags.push(["rate", price.trim()])
     }
 
     if (serviceType.trim()) {
-      tags.push(["service_type", serviceType.trim()])
+      tags.push(["rate_type", serviceType.trim()]) // e.g., "hourly", "fixed"
     }
 
     if (businessHours.trim()) {
-      tags.push(["business_hours", businessHours.trim()])
+      tags.push(["availability", businessHours.trim()])
+    }
+
+    // Add contact pubkey
+    tags.push(["contact", $session.pubkey])
+
+    if (category.trim()) {
+      tags.push(["t", category.trim()]) // Use #t tags for categorization
     }
 
     const created_at = now()
-    const ownedEvent = own(makeEvent(CLASSIFIED, {content, tags, created_at}), $session.pubkey)
+    const ownedEvent = own(makeEvent(SERVICE, {content, tags, created_at}), $session.pubkey)
 
     let hashedEvent = hash(ownedEvent)
 

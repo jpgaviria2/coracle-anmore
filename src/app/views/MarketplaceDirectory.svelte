@@ -1,6 +1,5 @@
 <script lang="ts">
-  import {CLASSIFIED} from "@welshman/util"
-  import {makeKindFeed, makeTagFeed, makeIntersectionFeed} from "@welshman/feeds"
+  import {makeKindFeed} from "@welshman/feeds"
   import {signer} from "@welshman/app"
   import Feed from "src/app/shared/Feed.svelte"
   import Content from "src/partials/Content.svelte"
@@ -10,11 +9,11 @@
   import {router} from "src/app/util/router"
   import {makeFeed} from "src/domain"
 
+  // Marketplace listing event kind
+  const MARKETPLACE = 30017
+
   const marketplaceFeed = makeFeed({
-    definition: makeIntersectionFeed(
-      makeKindFeed(CLASSIFIED),
-      makeTagFeed("#t", "item")
-    ),
+    definition: makeKindFeed(MARKETPLACE),
   })
 
   const createMarketplaceItem = () => router.at("marketplace/create").open()

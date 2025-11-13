@@ -2,8 +2,11 @@
   import {now} from "@welshman/lib"
   import {own, hash} from "@welshman/signer"
   import {Router, addMinimalFallbacks} from "@welshman/router"
-  import {makeEvent, CLASSIFIED} from "@welshman/util"
+  import {makeEvent} from "@welshman/util"
   import {session, publishThunk} from "@welshman/app"
+
+  // Marketplace listing event kind
+  const MARKETPLACE = 30017
   import {writable} from "svelte/store"
   import {makePow} from "src/util/pow"
   import type {ProofOfWork} from "src/util/pow"
@@ -39,8 +42,7 @@
 
     const tags = [
       ["title", title.trim()],
-      ["summary", summary.trim() || title.trim()],
-      ["t", "item"], // Mark as marketplace item
+      ["description", content],
       ["t", env.DEFAULT_HASHTAG || "anmore"], // Add default hashtag
       ...getClientTags(),
     ]
@@ -50,11 +52,12 @@
     }
 
     if (price.trim()) {
-      tags.push(["price", price.trim(), "SAT"])
+      tags.push(["price", price.trim()])
+      tags.push(["currency", "SAT"])
     }
 
     if (category.trim()) {
-      tags.push(["category", category.trim()])
+      tags.push(["t", category.trim()]) // Use #t tags for categorization
     }
 
     if (condition.trim()) {
@@ -62,7 +65,7 @@
     }
 
     const created_at = now()
-    const ownedEvent = own(makeEvent(CLASSIFIED, {content, tags, created_at}), $session.pubkey)
+    const ownedEvent = own(makeEvent(MARKETPLACE, {content, tags, created_at}), $session.pubkey)
 
     let hashedEvent = hash(ownedEvent)
 
