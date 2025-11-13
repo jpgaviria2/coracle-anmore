@@ -117,5 +117,8 @@
     "onlyBuiltDependencies": [
       "sharp"
     ]
+  },
+  "devDependencies": {
+    "pwa-asset-generator": "^8.1.2"
   }
 }

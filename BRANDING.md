@@ -25,22 +25,33 @@ All logo files should be placed in `public/images/`:
 
 ### Favicon/Icons (PWA)
 
-All icon files should be placed in `public/icons/`:
+Icons are generated using [pwa-asset-generator](https://github.com/elegantapp/pwa-asset-generator) and placed in two locations:
 
-These icons are used for Progressive Web App (PWA) installation and browser favicons. All should be in WebP format for optimal performance:
+**`public/images/`** - Contains:
+- **`manifest-icon-192.maskable.png`** - 192x192px (PWA manifest)
+- **`manifest-icon-512.maskable.png`** - 512x512px (PWA manifest)
+- **`apple-icon-180.png`** - 180x180px (Apple touch icon)
+- **`favicon-196.png`** - 196x196px (Favicon)
+- **`apple-splash-*.png`** - All iOS splash screen images for various device sizes
 
-- **`icon-48.webp`** - 48x48px
-- **`icon-72.webp`** - 72x72px
-- **`icon-96.webp`** - 96x96px
-- **`icon-128.webp`** - 128x128px
-- **`icon-192.webp`** - 192x192px (PWA home screen icon)
-- **`icon-256.webp`** - 256x256px
-- **`icon-512.webp`** - 512x512px (PWA splash screen)
+**`public/icons/`** - Contains:
+- **`favicon.ico`** - Multi-size favicon
+- **`favicon-16x16.png`**, **`favicon-32x32.png`**, **`favicon-48x48.png`** - Standard favicon sizes
+- **`apple-touch-icon-*.png`** - Various Apple touch icon sizes (57x57, 60x60, 72x72, 76x76, 114x114, 120x120, 144x144, 152x152, 167x167, 180x180)
+- **`android-chrome-*.png`** - Android Chrome icons (36x36, 48x48, 72x72, 96x96, 144x144, 192x192, 256x256, 384x384, 512x512)
+- **`mstile-*.png`** - Microsoft tile icons (70x70, 144x144, 150x150, 310x150, 310x310)
 
-**Icon Generation**: You can use tools like:
-- [PWA Asset Generator](https://github.com/elegantapp/pwa-asset-generator)
-- [RealFaviconGenerator](https://realfavicongenerator.net/)
-- [Favicon.io](https://favicon.io/)
+**Icon Generation**: Icons are automatically generated from `public/images/logo.png` using:
+```bash
+# Generate icons and favicons
+pnpm exec pwa-asset-generator public/images/logo.png public/images --icon-only --favicon --type png --opaque false --index index.html --manifest public/manifest.webmanifest
+
+# Generate splash screens
+pnpm exec pwa-asset-generator public/images/logo.png public/images --splash-only --background "#000000" --type png --index index.html
+
+# Generate additional icon sizes for icons folder
+pnpm exec pwa-asset-generator public/images/logo.png public/icons --icon-only --type png --opaque false --path /icons
+```
 
 ### Banner/Header
 
@@ -211,15 +222,18 @@ public/
 │   ├── logo.png
 │   ├── wordmark-dark.png
 │   ├── wordmark-light.png
-│   └── banner.png
+│   ├── banner.png
+│   ├── manifest-icon-192.maskable.png
+│   ├── manifest-icon-512.maskable.png
+│   ├── apple-icon-180.png
+│   ├── favicon-196.png
+│   └── apple-splash-*.png (40+ splash screen images)
 ├── icons/
-│   ├── icon-48.webp
-│   ├── icon-72.webp
-│   ├── icon-96.webp
-│   ├── icon-128.webp
-│   ├── icon-192.webp
-│   ├── icon-256.webp
-│   └── icon-512.webp
+│   ├── favicon.ico
+│   ├── favicon-*.png (16x16, 32x32, 48x48)
+│   ├── apple-touch-icon-*.png (multiple sizes)
+│   ├── android-chrome-*.png (multiple sizes)
+│   └── mstile-*.png (multiple sizes)
 └── manifest.webmanifest
 ```
 
