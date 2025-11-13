@@ -52,6 +52,7 @@
   import LoginBunker from "src/app/views/LoginBunker.svelte"
   import LoginConnect from "src/app/views/LoginConnect.svelte"
   import LoginNip05 from "src/app/views/LoginNip05.svelte"
+  import SignupNip05 from "src/app/views/SignupNip05.svelte"
   import Logout from "src/app/views/Logout.svelte"
   import MediaDetail from "src/app/views/MediaDetail.svelte"
   import NoteCreate from "src/app/views/NoteCreate.svelte"
@@ -175,6 +176,7 @@
   router.register("/login", Login)
   router.register("/login/nip05", LoginNip05)
   router.register("/login/bunker", LoginBunker)
+  router.register("/signup/nip05", SignupNip05)
   router.register("/login/connect", LoginConnect, {
     requireUser: true,
   })

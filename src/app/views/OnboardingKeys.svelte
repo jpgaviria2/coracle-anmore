@@ -3,6 +3,8 @@
   import {themeColors, appName} from "src/partials/state"
   import Link from "src/partials/Link.svelte"
   import Button from "src/partials/Button.svelte"
+  import {router} from "src/app/util/router"
+  import {env} from "src/engine"
 
   export let setStage
   export let nstartCompleted
@@ -20,6 +22,10 @@
   const prev = () => setStage("intro")
 
   const next = () => setStage("follows")
+
+  const useNip05Signup = () => {
+    router.at("signup/nip05").pushModal()
+  }
 </script>
 
 <div class="flex gap-3">
@@ -30,18 +36,26 @@
   <p class="text-2xl font-bold">Create your Profile</p>
 </div>
 <p>
-  To get you started, we'll redirect you to an app called <strong>nstart</strong>, which will guide
-  you through the process of creating and securely storing your account keys.
+  Create your account with a @{env.NIP05_DOMAIN} identifier for simplified login, or use the traditional method.
 </p>
-<p>
-  Nstart will also help you fill out your social profile, then when you're done you'll be sent back
-  here to finish setting up your account.
-</p>
-<div class="flex gap-2">
-  <Button class="btn" on:click={prev}><i class="fa fa-arrow-left" /> Back</Button>
-  {#if nstartCompleted}
-    <Button class="btn btn-accent flex-grow" on:click={next}>Continue</Button>
-  {:else}
-    <Link class="btn btn-accent flex-grow" href={nstart} external target="">Continue</Link>
-  {/if}
+<div class="flex flex-col gap-2">
+  <Button class="btn btn-accent" on:click={useNip05Signup}>
+    <i class="fa fa-at" /> Create Account with NIP-05 (@{env.NIP05_DOMAIN})
+  </Button>
+  <div class="relative flex items-center py-2">
+    <div class="flex-grow border-t border-neutral-600"></div>
+    <span class="px-4 text-sm text-neutral-400">or</span>
+    <div class="flex-grow border-t border-neutral-600"></div>
+  </div>
+  <p class="text-sm text-neutral-400">
+    Alternatively, you can use <strong>nstart</strong> to create your account keys and profile.
+  </p>
+  <div class="flex gap-2">
+    <Button class="btn" on:click={prev}><i class="fa fa-arrow-left" /> Back</Button>
+    {#if nstartCompleted}
+      <Button class="btn btn-accent flex-grow" on:click={next}>Continue</Button>
+    {:else}
+      <Link class="btn btn-accent flex-grow" href={nstart} external target="">Use nstart</Link>
+    {/if}
+  </div>
 </div>
