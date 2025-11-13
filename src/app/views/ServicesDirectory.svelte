@@ -1,6 +1,6 @@
 <script lang="ts">
   import {CLASSIFIED} from "@welshman/util"
-  import {makeScopeFeed, Scope} from "@welshman/feeds"
+  import {makeKindFeed, makeTagFeed, makeIntersectionFeed} from "@welshman/feeds"
   import {signer} from "@welshman/app"
   import Feed from "src/app/shared/Feed.svelte"
   import Content from "src/partials/Content.svelte"
@@ -11,11 +11,10 @@
   import {makeFeed} from "src/domain"
 
   const servicesFeed = makeFeed({
-    definition: makeScopeFeed({
-      scope: Scope.Kind,
-      kinds: [CLASSIFIED],
-      filters: [{kinds: [CLASSIFIED], "#t": ["service"]}],
-    }),
+    definition: makeIntersectionFeed(
+      makeKindFeed(CLASSIFIED),
+      makeTagFeed("#t", "service")
+    ),
   })
 
   const createService = () => router.at("services/create").open()
