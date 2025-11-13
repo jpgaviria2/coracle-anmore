@@ -23,6 +23,15 @@ export default defineConfig({
         ...config.env,
         ...process.env,
       }
+      
+      // Handle uncaught exceptions
+      on("task", {
+        log(message) {
+          console.log(message)
+          return null
+        },
+      })
+      
       return config
     },
   },

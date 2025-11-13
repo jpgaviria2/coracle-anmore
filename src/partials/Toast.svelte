@@ -31,6 +31,8 @@
 
   export const showWarning = (message, opts = {}) => showToast({message, theme: "warning", ...opts})
 
+  export const showSuccess = (message, opts = {}) => showToast({message, theme: "success", ...opts})
+
   export const showPublishInfo = (thunk: Thunk, opts = {}) =>
     showToast({thunk, type: "publish", ...opts})
 
@@ -110,6 +112,7 @@
         {
           "border-neutral-600 bg-tinted-700 text-neutral-100": theme === "info",
           "border-warning bg-tinted-700 text-neutral-100": theme === "warning",
+          "border-green-600 bg-tinted-700 text-neutral-100": theme === "success",
         },
       )}>
       {#if type === "text"}
